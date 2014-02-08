@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<plugin>
+	<extension point="org.eclipse.ui.console.consolePageParticipants">
+		<consolePageParticipant class="se.liu.lysator.dahlberg.eclipse.history.HistoryConsolePage"
+			id="se.liu.lysator.dahlberg.consolehistory.historyConsolePage">
+			<enablement>
+				<instanceof value="org.eclipse.debug.internal.ui.views.console.ProcessConsole" />
+			</enablement>
+		</consolePageParticipant>
+	</extension>
+</plugin>

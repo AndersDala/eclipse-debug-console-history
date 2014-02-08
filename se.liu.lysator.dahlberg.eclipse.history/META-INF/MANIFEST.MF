@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: se.liu.lysator.dahlberg.eclipse.history
+Bundle-SymbolicName: se.liu.lysator.dahlberg.eclipse.history;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: se.liu.lysator.dahlberg.eclipse.history.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.console
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
