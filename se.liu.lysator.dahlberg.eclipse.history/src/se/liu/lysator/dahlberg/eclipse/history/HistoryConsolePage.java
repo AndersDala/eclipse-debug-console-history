@@ -3,16 +3,8 @@ package se.liu.lysator.dahlberg.eclipse.history;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.VerifyKeyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsolePageParticipant;
-import org.eclipse.ui.part.IPageBookViewPage;
 
 /**
  * Adds a trivial history to the Eclipse ProcessConsole view.
@@ -23,11 +15,8 @@ import org.eclipse.ui.part.IPageBookViewPage;
  * @version 1.0
  *
  */
-public class HistoryConsolePage implements IConsolePageParticipant, 
-		VerifyKeyListener, MouseListener {
+public class HistoryConsolePage extends StyledTextConsolePage {
 
-	private StyledText tc;
-	private int caretPosition = 0;
 	private int index = 0;
 	// TODO store/re-use history per launch configuration?
 	private List<String> history = new ArrayList<String>();
@@ -37,55 +26,6 @@ public class HistoryConsolePage implements IConsolePageParticipant,
 		history.add("");
 	}
 	
-	@Override
-	public Object getAdapter(@SuppressWarnings("rawtypes") Class cls) {
-		return null;
-	}
-
-	@Override
-	public void mouseDoubleClick(MouseEvent me) {
-		caretPosition = tc.getCaretOffset();
-	}
-
-	@Override
-	public void mouseDown(MouseEvent me) {		
-		caretPosition = tc.getCaretOffset();
-	}
-
-	@Override
-	public void mouseUp(MouseEvent me) {
-		caretPosition = tc.getCaretOffset();
-	}
-	@Override
-	public void activated() {
-		caretPosition = tc.getCaretOffset();
-	}
-
-	@Override
-	public void deactivated() {}
-
-	@Override
-	public void dispose() {
-		tc.removeVerifyKeyListener(this);
-		tc.removeMouseListener(this);
-	}
-
-	@Override
-	public void init(IPageBookViewPage viewPage, IConsole console) {
-		Control control = viewPage.getControl();
-		
-		if (control instanceof StyledText) {
-			this.tc = (StyledText) control;
-			tc.addVerifyKeyListener(this);
-			tc.addMouseListener(this);
-			caretPosition = tc.getCaretOffset();
-		} else {
-			String exception = "This plugin requires that the ProcessConsole "
-					+ "is using a StyledText control";
-			throw new IllegalStateException(exception);
-		}
-	}
-
 	@Override
 	public void verifyKey(VerifyEvent event) {
 		int key = event.keyCode;
@@ -105,12 +45,12 @@ public class HistoryConsolePage implements IConsolePageParticipant,
 			// Ignore, strange key? Modifier? Move?
 		} else if (key == 0xd) {
 			// key enter => save to history
-			String text = getCurrentLineText();
+			String text = util.getCurrentLineText();
 			addHistory(text);
-			caretPosition = tc.getCaretOffset();
+			util.setCaretPosition(tc.getCaretOffset());
 			index = 0;
 		} else {
-			caretPosition = tc.getCaretOffset();
+			util.setCaretPosition(tc.getCaretOffset());
 		}
 	}
 
@@ -143,24 +83,13 @@ public class HistoryConsolePage implements IConsolePageParticipant,
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				int line = tc.getLineAtOffset(caretPosition);
-				int begin = tc.getOffsetAtLine(line);
-				int nextLine = line + 1;
-				int end = nextLine < tc.getLineCount() ? tc.getOffsetAtLine(nextLine) : tc.getCharCount();
+				int begin = util.getBegin();
+				int end = util.getEnd();
+				assert begin <= end;
 				tc.setSelection(begin, end);
 				tc.insert(text);
-				caretPosition = tc.getCaretOffset();
+				util.setCaretPosition(tc.getCaretOffset());
 			}
 		});
-	}
-	
-	private String getCurrentLineText() {
-		int line = tc.getLineAtOffset(caretPosition);
-		int begin = tc.getOffsetAtLine(line);
-		int nextLine = line + 1;
-		int end = nextLine < tc.getLineCount() ? tc.getOffsetAtLine(nextLine) : tc.getCharCount();
-		// check for empty or single character lines 
-		String text = end > begin + 1 ? tc.getText(begin, end - 1) : "";
-		return text;
 	}
 }

@@ -7,5 +7,11 @@
 				<instanceof value="org.eclipse.debug.internal.ui.views.console.ProcessConsole" />
 			</enablement>
 		</consolePageParticipant>
+		<consolePageParticipant class="se.liu.lysator.dahlberg.eclipse.history.GdbCompletionConsolePage"
+			id="se.liu.lysator.dahlberg.consolehistory.gdbCompletionConsolePage">
+			<enablement>
+				<instanceof value="org.eclipse.debug.internal.ui.views.console.ProcessConsole" />
+			</enablement>
+		</consolePageParticipant>
 	</extension>
 </plugin>
